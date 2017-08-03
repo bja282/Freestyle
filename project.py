@@ -1,12 +1,6 @@
 from urllib.request import urlopen
 from bs4 import *
 
-# for tag in soup.find_all(re.compile("^name")):
-#      print(tag)
-#
-# for tag in soup.find_all('name'):
-#      tag.string
-
 url = 'http://web.mta.info/status/serviceStatus.txt'
 response = urlopen(url)
 soup = BeautifulSoup(response, 'lxml-xml')
@@ -23,12 +17,12 @@ for tag in xml_tags:
     }
     lines.append(line)
 
-#print(lines)
-
 for line in lines:
      print("+", line['name']+", Service Status: "+line['status'])#+" "+line['desc'])
 
-while x == True:
+while True:
     service_prompt = input("Please enter the name of an MTA service to review its current service status: ")
     if service_prompt == "123":
-        print(line[0])
+        print(lines[0]['desc'])
+    if service_prompt == "done":
+        break
