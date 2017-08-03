@@ -20,9 +20,25 @@ for tag in xml_tags:
 for line in lines:
      print("+", line['name']+", Service Status: "+line['status'])#+" "+line['desc'])
 
+# the long way
+def line_lookup(name):
+  matches = []
+  for line in lines:
+      if line["name"].upper() == name.upper():
+          matches.append(line)
+  print("Line: "+matches[0]["name"]+"\n"+"Service Status: ",matches[0]["desc"])
+
+
 while True:
-    service_prompt = input("Please enter the name of an MTA service to review its current service status: ")
-    if service_prompt == "123":
-        print(lines[0]['desc'])
-    if service_prompt == "done":
-        break
+    try:
+        service_prompt = input("Please enter the name of an MTA service to review its current service status: ")
+        if service_prompt != "done":
+            line_lookup(service_prompt)
+        else:
+            break
+    except(IndexError, ValueError):
+        service_prompt = input("Sorry, didn't recognize that. Try again? ")
+        if service_prompt != "done":
+            line_lookup(service_prompt)
+        else:
+            break
