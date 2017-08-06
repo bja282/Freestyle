@@ -1,3 +1,4 @@
+import code
 from urllib.request import urlopen
 from bs4 import *
 
@@ -13,14 +14,30 @@ for tag in xml_tags:
     line = {
         "name": tag.find('name').string,
         "status": tag.find('status').string,
-        "desc": tag.find('text').string
+        "date": tag.find('Date').string,
+        "time": tag.find('Time').string,
+        "desc": BeautifulSoup(tag.find('text').prettify(formatter=None))
     }
     lines.append(line)
 
 for line in lines:
      print("+", line['name']+", Service Status: "+line['status'])#+" "+line['desc'])
 
-# the long way
+#Text parser - just looking to extract the service changes and leave behind HTML
+def soupertrain(bowl):
+    paprika = []
+    if bowl['status'].lower() != "Good Service".lower():
+        try:
+            leansoup = bowl['desc'].find_all('a')
+            for x in range(0, len(leansoup)):
+                if leansoup[x].has_attr('class') and leansoup[x].has_attr('onclick'):
+                    paprika.append(leansoup[x].text)
+        except(ValueError, IndexError):
+            pass
+    else:
+        paprika.append(bowl['status'].title())
+    print(paprika)
+
 def line_lookup(name):
   matches = []
   for line in lines:
@@ -28,11 +45,13 @@ def line_lookup(name):
           matches.append(line)
   print("Line: "+matches[0]["name"]+"\n"+"Service Status: ",matches[0]["desc"])
 
-
+#MENU
 while True:
     try:
         service_prompt = input("Please enter the name of an MTA service to review its current service status: ")
-        if service_prompt != "done":
+        if service_prompt.lower() == "interact":
+            code.interact(local=locals())
+        if service_prompt.lower() != "done":
             line_lookup(service_prompt)
         else:
             break
