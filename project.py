@@ -16,12 +16,10 @@ for tag in xml_tags:
         "status": tag.find('status').string,
         "date": tag.find('Date').string,
         "time": tag.find('Time').string,
-        "desc": BeautifulSoup(tag.find('text').prettify(formatter=None))
+        "desc": BeautifulSoup(tag.find('text').prettify(formatter=None)),
+        "announcements": ""
     }
     lines.append(line)
-
-for line in lines:
-     print("+", line['name']+", Service Status: "+line['status'])#+" "+line['desc'])
 
 #Text parser - just looking to extract the service changes and leave behind HTML
 def soupertrain(bowl):
@@ -36,7 +34,12 @@ def soupertrain(bowl):
             pass
     else:
         paprika.append(bowl['status'].title())
-    print(paprika)
+    bowl['announcements']=paprika
+    #print(paprika)
+
+for line in lines:
+    soupertrain(line)
+    print("+", line['name']+", Service Status: "+line['status'])#+" "+line['desc'])
 
 def line_lookup(name):
   matches = []
