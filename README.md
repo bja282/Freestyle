@@ -1,4 +1,4 @@
-This is an application for logging and viewing my fitness data.
+This is an application for checking the current status of services operated by the MTA.
 
 Start by installing required packages. If your system is running Python 2, please run the following:
 pip install -r requirements.txt
