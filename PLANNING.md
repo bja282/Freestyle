@@ -1,5 +1,5 @@
-##Freestyle Project
-#Benjamin Alpert
+<b>Freestyle Project</b>
+Benjamin Alpert
 
 The purpose of this program is to allow a user to check for real-time MTA subway service updates and confirm service and operations prior to entering a subway station, in order to plan for a commute or trip accordingly.
 
