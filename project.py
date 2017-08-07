@@ -1,27 +1,30 @@
 import code
 from urllib.request import urlopen
+from IPython import embed
 from bs4 import *
 
+#Program-wide variables.
 url = 'http://web.mta.info/status/serviceStatus.txt'
 response = urlopen(url)
 soup = BeautifulSoup(response, 'lxml-xml')
-
 lines = []
-
 xml_tags = soup.find_all('line')
 
-for tag in xml_tags:
-    line = {
-        "name": tag.find('name').string,
-        "status": tag.find('status').string,
-        "date": tag.find('Date').string,
-        "time": tag.find('Time').string,
-        "desc": BeautifulSoup(tag.find('text').prettify(formatter=None), 'lxml'),
-        "announcements": ""
-    }
-    lines.append(line)
-
-#Text parser - just looking to extract the service changes and leave behind HTML
+#Parse the MTA current services.
+def parser():
+    for tag in xml_tags:
+        line = {
+            "name": tag.find('name').string,
+            "status": tag.find('status').string,
+            "date": tag.find('Date').string,
+            "time": tag.find('Time').string,
+            "desc": BeautifulSoup(tag.find('text').prettify(formatter=None), 'lxml'),
+            "announcements": "",
+            "type": ""
+        }
+        lines.append(line)
+parser()
+#Parse through MTA descriptions - just extract text relevant to service changes.
 def soupertrain(bowl):
     paprika = []
     if bowl['status'].lower() != "Good Service".lower():
@@ -46,9 +49,23 @@ def soupertrain(bowl):
         paprika.append(bowl['status'].title())
     bowl['announcements']=paprika
 
-for line in lines:
-    soupertrain(line)
-    print("+", line['name']+", Service Status: "+line['status'])#+" "+line['desc'])
+#Parse through train lines and identify line type (subway, rail, bridge/tunnel, or bus)
+def typeparse(line):
+    matches = []
+    for line in lines:
+        if line["name"].lower() in  line.upper():
+            matches.append(line)
+
+#List all lines: subways, trains (LIRR, MetroNorth), buses, and bridges/tunnels
+def listlines():
+    print("Below is a list of all subway, rail, bus and bridge and tunnel services operated by the MTA.")
+    for line in lines:
+        soupertrain(line)
+        print("+", line['name']+", Service Status: "+line['status'])#+" "+line['desc'])
+    print('''
+    To view this list again at any time, enter \"list\" into the prompt.
+    To exit this program at any time, enter \"done\" into the prompt.\n''')
+listlines()
 
 def numberofchanges(announcements):
     count = 0
@@ -87,22 +104,23 @@ def line_lookup(name):
       pass
   print("\n")
 
-
 #MENU
-while True:
-    try:
-        service_prompt = input("Please enter the name of an MTA service to review its current service status: ")
-        if service_prompt.lower() == "interact":
-            code.interact(local=locals())
-        if service_prompt.lower() != "done":
-            line_lookup(service_prompt)
-        else:
-            break
-    except(IndexError, ValueError):
-        service_prompt = input("Sorry, didn't recognize that. Try again? ")
-        if service_prompt != "done":
-            line_lookup(service_prompt)
-        else:
-            service_prompt = input("Sorry, didn't recognize that. Try again? ")
-            if service_prompt != "done":
+def menu():
+    while True:
+        try:
+            service_prompt = input("Please enter the name of an MTA service to review its current service status: ")
+            if service_prompt.lower() == "done":
+                break
+            if service_prompt.lower() == "interact":
+                embed()
+            if service_prompt.lower() == "list":
+                listlines()
+                menu()
+            if service_prompt.lower() != "done":
                 line_lookup(service_prompt)
+            else:
+                break
+        except(IndexError, ValueError):
+            print("\nSorry, didn't recognize that. Try again?\n")
+
+menu()
